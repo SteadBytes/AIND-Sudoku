@@ -17,8 +17,8 @@ row_units = [cross(r, cols) for r in rows]
 col_units = [cross(rows, c) for c in cols]
 sq_unit = [cross(r_grp, c_grp) for r_grp in ('ABC', 'DEF', 'GHI')
            for c_grp in ('123', '456', '789')]
-primary_diagonal = [r + d for r, d in zip(rows, digits)]
-secondary_diagonal = [r + d for r, d in zip(rows, digits[::-1])]
+primary_diagonal = [r + c for r, c in zip(rows, cols)]
+secondary_diagonal = [r + c for r, c in zip(rows, cols[::-1])]
 diag_units = [primary_diagonal, secondary_diagonal]
 unit_list = (row_units + col_units + sq_unit +
              diag_units)
@@ -52,8 +52,16 @@ def naked_twins(values):
     Returns:
         the values dictionary with the naked twins eliminated from peers.
     """
-    # Find all instances of naked twins
-    # Eliminate the naked twins as possibilities for their peers
+    two_possible = [b for b, v in values.items() if len(v) == 2]
+    twins = [[b1, b2] for b1 in two_possible for b2 in peers[b1]
+             if set(values[b1]) == set(values[b2])]
+    for pair in twins:
+        common_peers = set(peers[pair[0]]) & set(peers[pair[1]])
+        for peer in common_peers:
+            if len(values[peer]) > 2:
+                for v in values[pair[0]]:
+                    values[peer] = values[peer].replace(v, '')
+    return values
 
 
 def grid_values(grid):
@@ -112,6 +120,7 @@ def reduce_puzzle(values):
 
         values = eliminate(values)
         values = only_choice(values)
+        values = naked_twins(values)
         # Check how many boxes have a determined value
         solved_values_after = len(
             [box for box in values.keys() if len(values[box]) == 1])
