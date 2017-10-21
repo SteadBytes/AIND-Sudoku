@@ -7,7 +7,9 @@ A: *Student should provide answer here*
 
 # Question 2 (Diagonal Sudoku)
 Q: How do we use constraint propagation to solve the diagonal sudoku problem?  
-A: *Student should provide answer here*
+A: The two diagonals are another set of units. The same strategies (eliminate,
+only choice and search) can be applied as long as the diagonal units are
+included along with the row, column and 3x3 square units.
 
 ### Install
 
