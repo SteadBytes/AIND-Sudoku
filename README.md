@@ -3,7 +3,45 @@
 
 # Question 1 (Naked Twins)
 Q: How do we use constraint propagation to solve the naked twins problem?  
-A: *Student should provide answer here*
+A: Naked Twins uses disjoint subsets to reduce the problem space in Sudoku. The rule states:
+* If any two boxes belonging to a unit have only two possible values and these values are the same, then these values can be **removed** from the possibilities for all other boxes in the unit.
+
+For example, given the row:
+```
+[1,3,6,9], [1,5], 4, [3,6,9], 8, 7, [1,5], [1,6], 2
+# possibiliites for undetermined boxes in []
+```
+The possible values `[1,5]` are present in **two** different boxes. Therefore, the values `[1,5]` can be eliminated from all other undetermined boxes in the row:
+```
+[3,6,9], [1,5], 4, [3,6,9], 8, 7, [1,5], [6], 2
+# in this case, only the '1' was present as a possibility in other boxes
+```
+All possible twins need to be found in a given grid. Then, for each pair any undetermined boxes in the same unit as the twins can have the values of the twins eliminated.
+
+Note: `values` is a dictionary representing the Sudoku grid. It contains the **possible** values for each box in the grid. Given a grid with rows `[A...I]` and columns `[1...9]`
+```
+values = {'A1':1, 'A2':'12345', 'A3':123456789...}
+```
+
+Find a subset of boxes in the grid which have **only two** possible values:
+```python
+two_possible = [b for b, v in values.items() if len(v) == 2]
+```
+Use `two_possible` to find naked twins by finding boxes whose two values are the same as one of those in its peers. This means they are in a unit together and thus create a naked pair:
+```python
+twins = [[b1, b2] for b1 in two_possible for b2 in peers[b1]
+            if set(values[b1]) == set(values[b2])]
+# sets are used as values could be in either order -> '12' and '21' should match
+```
+Then, for each pair of boxes in `twins` find the peers which they have in common (are in the same unit) and then eliminate the values of the pairs from their possible values - provided the peer hasn't already been determined:
+```python
+for pair in twins:
+    common_peers = set(peers[pair[0]]) & set(peers[pair[1]])
+    for peer in common_peers:
+        if len(values[peer]) > 2:
+            for v in values[pair[0]]:
+                values[peer] = values[peer].replace(v, '')
+```
 
 # Question 2 (Diagonal Sudoku)
 Q: How do we use constraint propagation to solve the diagonal sudoku problem?  
@@ -11,6 +49,15 @@ A: The two diagonals are another set of units. The same strategies (eliminate,
 only choice and search) can be applied as long as the diagonal units are
 included along with the row, column and 3x3 square units.
 
+Diagonal units can be produced as follows:
+```python
+cols = '123456789'
+rows = 'ABCDEFGHI'
+primary_diagonal = [r + c for r, c in zip(rows, cols)]
+secondary_diagonal = [r + c for r, c in zip(rows, cols[::-1])]
+diag_units = [primary_diagonal, secondary_diagonal]
+```
+`diag_units` can then be included along with other unit types in any constraint propagation techniques used.
 ### Install
 
 This project requires **Python 3**.
