@@ -23,8 +23,8 @@ row_units = [cross(r, cols) for r in rows]
 col_units = [cross(rows, c) for c in cols]
 
 # ex [A1,A2,A3,B1,B2,B3,C1,C2,C3]
-sq_unit = [cross(r_grp, c_grp) for r_grp in ('ABC', 'DEF', 'GHI')
-           for c_grp in ('123', '456', '789')]
+sq_units = [cross(r_grp, c_grp) for r_grp in ('ABC', 'DEF', 'GHI')
+            for c_grp in ('123', '456', '789')]
 
 # ex ['A1','B2','C3'...'I9']
 primary_diagonal = [r + c for r, c in zip(rows, cols)]
@@ -35,7 +35,7 @@ diag_units = [primary_diagonal, secondary_diagonal]
 
 # Collect all possible units together
 # list of lists of squares in each unit [[<squares unit>],[<squares unit>]]
-unit_list = (row_units + col_units + sq_unit +
+unit_list = (row_units + col_units + sq_units +
              diag_units)
 
 # Mapping from each square (ex A1) to the units it belongs to
