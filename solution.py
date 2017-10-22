@@ -77,7 +77,7 @@ def naked_twins(values):
     for pair in twins:
         common_peers = set(peers[pair[0]]) & set(peers[pair[1]])
         for peer in common_peers:
-            if len(values[peer]) > 2:
+            if len(values[peer]) >= 2:
                 for v in values[pair[0]]:
                     assign_value(values, peer, values[peer].replace(v, ''))
     return values
@@ -92,7 +92,7 @@ def grid_values(grid):
     Returns:
         A grid in dictionary form
             Keys: The boxes, e.g., 'A1'
-            Values: The value in each box, e.g., '8'. If the box has no value, 
+            Values: The value in each box, e.g., '8'. If the box has no value,
                     then the value will be '123456789'.
     """
     return {s: v if v != '.' else digits for s, v in zip(boxes, grid)}
@@ -105,15 +105,15 @@ def display(values):
     Args:
         values(dict): The sudoku in dictionary form
     """
-    count = 0
-    for row in row_units:
-        if count % 3 == 0 and count != 0:
-            print('-' * 24)
-        row_vals = ' '.join([values[x] for x in row])
-        output_str = ' | '.join(row_vals[i:i + 6]
-                                for i in range(0, len(row_vals), 6))
-        print(output_str)
-        count += 1
+    max_box_width = max(len(values[b]) for b in boxes) + 1
+    for i in range(len(row_units)):
+        row = ''.join(values[b].center(max_box_width) for b in row_units[i])
+        row = ' | '.join(row[i:i + max_box_width * 3]
+                         for i in range(0, len(row), max_box_width * 3))
+        if i > 0 and i % 3 == 0:
+            print('-' * len(row))
+
+        print(row)
 
 
 def eliminate(values):
