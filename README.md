@@ -4,16 +4,16 @@
 # Question 1 (Naked Twins)
 Q: How do we use constraint propagation to solve the naked twins problem?  
 A: Naked Twins uses disjoint subsets to reduce the problem space in Sudoku. The rule states:
-* If any two boxes belonging to a unit have only two possible values and these values are the same, then these values can be **removed** from the possibilities for all other boxes in the unit.
+* If any two boxes belonging to a unit have only two possible values and these values are the same, then these values can only be in these boxes and can be **removed** from the possibilities for all other boxes in the unit.
+* The pair of twins form a **disjoint subset** of the row, meaning that there is no elements in common (intersection = &empty;) between the twins and the other sets in the row.
 
 For example, given the row:
 ```
-[1,3,6,9], [1,5], 4, [3,6,9], 8, 7, [1,5], [1,6], 2
-# possibiliites for undetermined boxes in []
+row = [{1,3,6,9}, {1,5}, {4}, {3,6,9}, {8}, {7}, {1,5}, {1,6}, {2}]
 ```
-The possible values `[1,5]` are present in **two** different boxes. Therefore, the values `[1,5]` can be eliminated from all other undetermined boxes in the row:
+The possible values `{1,5}` are present in **two** different boxes, forming a **disjoint subset** of the row. Therefore, the values `{1,5}` can be eliminated from all other undetermined boxes in the row:
 ```
-[3,6,9], [1,5], 4, [3,6,9], 8, 7, [1,5], [6], 2
+row = [{3,6,9}, {1,5}, {4}, {3,6,9}, {8}, {7}, {1,5}, {6}, {2}]
 # in this case, only the '1' was present as a possibility in other boxes
 ```
 All possible twins need to be found in a given grid. Then, for each pair any undetermined boxes in the same unit as the twins can have the values of the twins eliminated.
