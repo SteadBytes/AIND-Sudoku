@@ -60,7 +60,7 @@ def naked_twins(values):
         for peer in common_peers:
             if len(values[peer]) > 2:
                 for v in values[pair[0]]:
-                    values[peer] = values[peer].replace(v, '')
+                    assign_value(values, peer, values[peer].replace(v, ''))
     return values
 
 
@@ -72,7 +72,8 @@ def grid_values(grid):
     Returns:
         A grid in dictionary form
             Keys: The boxes, e.g., 'A1'
-            Values: The value in each box, e.g., '8'. If the box has no value, then the value will be '123456789'.
+            Values: The value in each box, e.g., '8'. If the box has no value, 
+                    then the value will be '123456789'.
     """
     return {s: v if v != '.' else digits for s, v in zip(boxes, grid)}
 
@@ -98,7 +99,7 @@ def eliminate(values):
     solved = [b for b in boxes if len(values[b]) == 1]
     for b in solved:
         for p in peers[b]:
-            values[p] = values[p].replace(values[b], '')
+            assign_value(values, p, values[p].replace(values[b], ''))
     return values
 
 
@@ -107,7 +108,7 @@ def only_choice(values):
         for d in '123456789':
             possible_boxes = [b for b in unit if d in values[b]]
             if len(possible_boxes) == 1:
-                values[possible_boxes[0]] = d
+                assign_value(values, possible_boxes[0], d)
     return values
 
 
@@ -126,7 +127,7 @@ def reduce_puzzle(values):
             [box for box in values.keys() if len(values[box]) == 1])
         # If no new values were added, stop the loop.
         stalled = solved_values_before == solved_values_after
-        # Sanity check, return False if there is a box with zero available values:
+        # Sanity check, return False if there is a box with zero poss values:
         if len([box for box in values.keys() if len(values[box]) == 0]):
             return False
     return values
@@ -148,7 +149,7 @@ def search(values):
 
     for value in values[s]:
         new_grid = values.copy()
-        new_grid[s] = value
+        assign_value(new_grid, s, value)
         result = search(new_grid)
         if result:  # returns False unless solved
             return result
