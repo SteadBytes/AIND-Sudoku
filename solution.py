@@ -7,22 +7,39 @@ def cross(A, B):
     return [a + b for a in A for b in B]
 
 
+# Setup Sudoku grid structure
 digits = '123456789'
 rows = 'ABCDEFGHI'
 boxes = cross(rows, digits)
 cols = digits
 
+# units are each 9 box section of the board within which the digits 1-9 must
+# appear only once
 
+# ex [A1,A2,A3...A9]
 row_units = [cross(r, cols) for r in rows]
+
+# ex [A1, B1, C1, I9]
 col_units = [cross(rows, c) for c in cols]
+
+# ex [A1,A2,A3,B1,B2,B3,C1,C2,C3]
 sq_unit = [cross(r_grp, c_grp) for r_grp in ('ABC', 'DEF', 'GHI')
            for c_grp in ('123', '456', '789')]
+
+# ex ['A1','B2','C3'...'I9']
 primary_diagonal = [r + c for r, c in zip(rows, cols)]
+
+# ex ['A9','B8','C7'...'I1']
 secondary_diagonal = [r + c for r, c in zip(rows, cols[::-1])]
 diag_units = [primary_diagonal, secondary_diagonal]
+
+# Collect all possible units together
+# list of lists of squares in each unit [[<squares unit>],[<squares unit>]]
 unit_list = (row_units + col_units + sq_unit +
              diag_units)
 
+# Mapping from each square (ex A1) to the units it belongs to
+# {'A1': [[A1,A2,A3...A9],[A1, B1, C1, I9],[A1,A2,A3,B1,B2,B3,C1,C2,C3]]...}
 units = {s: [unit for unit in unit_list if s in unit] for s in boxes}
 
 peers = {s: set(sum(units[s], [])) - set([s]) for s in boxes}
@@ -34,7 +51,8 @@ def assign_value(values, box, value):
     Assigns a value to a given box. If it updates the board record it.
     """
 
-    # Don't waste memory appending actions that don't actually change any values
+    # Don't waste memory appending actions that don't actually change any
+    # values
     if values[box] == value:
         return values
 
@@ -46,6 +64,7 @@ def assign_value(values, box, value):
 
 def naked_twins(values):
     """Eliminate values using the naked twins strategy.
+
     Args:
         values(dict): a dictionary of the form {'box_name': '123456789', ...}
 
@@ -67,6 +86,7 @@ def naked_twins(values):
 def grid_values(grid):
     """
     Convert grid into a dict of {square: char} with '123456789' for empties.
+
     Args:
         grid(string) - A grid in string form.
     Returns:
@@ -80,7 +100,8 @@ def grid_values(grid):
 
 def display(values):
     """
-    Display the values as a 2-D grid.
+    Display the values as a 2-D grid, separated into 3x3 sections
+
     Args:
         values(dict): The sudoku in dictionary form
     """
@@ -96,6 +117,13 @@ def display(values):
 
 
 def eliminate(values):
+    """ Removes the value of each determined box from its peers.
+
+    Args:
+        values(dict): The sudoku in dictionary form
+    Returns:
+        updated values dictionary
+    """
     solved = [b for b in boxes if len(values[b]) == 1]
     for b in solved:
         for p in peers[b]:
@@ -104,6 +132,16 @@ def eliminate(values):
 
 
 def only_choice(values):
+    """ Finds boxes which have a unique possible value in a unit and assigns
+    that value to the box. 
+    Applies the strategy 'If there is only one box in a unit which would
+    allow a certain digit, then that box *must* be assigned that digit'
+
+    Args:
+        values(dict): The sudoku in dictionary form
+    Returns:
+        updated values dictionary
+    """
     for unit in unit_list:
         for d in '123456789':
             possible_boxes = [b for b in unit if d in values[b]]
@@ -113,12 +151,22 @@ def only_choice(values):
 
 
 def reduce_puzzle(values):
+    """ Repeatedly applies eliminate, only_choice and naked_twins strategies
+    on the Sudoku to reduce the problem space, until no more progress is made.
+
+    Args:
+        values(dict): The sudoku in dictionary form
+    Returns:
+        values dictionary reduced as much as possible
+        False if a box has 0 possible values -> error in strategy or puzzle
+    """
     stalled = False
     while not stalled:
         # Check how many boxes have a determined value
         solved_values_before = len(
             [box for box in values.keys() if len(values[box]) == 1])
 
+        # Apply constraint propagation strategies
         values = eliminate(values)
         values = only_choice(values)
         values = naked_twins(values)
@@ -134,6 +182,11 @@ def reduce_puzzle(values):
 
 
 def search(values):
+    """ Applies constraint propagation in a Depth First Search strategy. The
+    board is reduced as far as possible, then the box with the mininum possible
+    values is chosen and recursively attempt to solve the puzzle obtained 
+    by choosing each possible value.
+    """
     values = reduce_puzzle(values)
     if values is False:
         return False  # Failed in reduce_puzzle
@@ -160,9 +213,11 @@ def solve(grid):
     Find the solution to a Sudoku grid.
     Args:
         grid(string): a string representing a sudoku grid.
-            Example: '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
+            Example: ('2.............62....1....7...6..8...3...9...7...6..4...
+                        4....8....52.............3')
     Returns:
-        The dictionary representation of the final sudoku grid. False if no solution exists.
+        The dictionary representation of the final sudoku grid. 
+        False if no solution exists.
     """
     values = grid_values(grid)
     solution = search(values)
@@ -173,7 +228,8 @@ def solve(grid):
 
 
 if __name__ == '__main__':
-    diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
+    diag_sudoku_grid = ('2.............62....1....7...6..8...3...9...7...6..' +
+                        '4...4....8....52.............3')
     display(solve(diag_sudoku_grid))
 
     try:
@@ -183,4 +239,5 @@ if __name__ == '__main__':
     except SystemExit:
         pass
     except:
-        print('We could not visualize your board due to a pygame issue. Not a problem! It is not a requirement.')
+        print('We could not visualize your board due to a pygame issue.' +
+              'Not a problem! It is not a requirement.')
