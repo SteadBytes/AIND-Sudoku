@@ -1,6 +1,6 @@
 import sys
 assignments = []
-
+# Set to False to solve normal non-diagonal puzzles
 diagonal = True
 
 
