@@ -71,6 +71,23 @@ Optionally, you can also install pygame if you want to see your visualization. I
 
 If not, please see how to download pygame [here](http://www.pygame.org/download.shtml).
 
+### Usage
+The solver runs on **diagonal puzzles**. 
+* To change this, set the `diagonal = True` flag
+at the top of [`solution.py`](solution.py) to `diagonal = False`.
+
+Run the solver with a default diagonal Sudoku:
+* `$ python solution.py` 
+
+Use the `-p` flag to pass in a string representation of a puzzle:
+* `$ python solution.py -p 2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3`
+
+Use the `--novisual` flag to turn off pygame visualization and see results only
+in terminal:
+* * `$ python solution.py --novisual` 
+
+
+
 ### Code
 
 * `solution.py` - Fill in the required functions in this file to complete the project.
