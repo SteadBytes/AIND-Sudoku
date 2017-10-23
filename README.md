@@ -1,5 +1,5 @@
-# Artificial Intelligence Nanodegree
-## Introductory Project: Diagonal Sudoku Solver
+# Diagonal Sudoku Solver
+![Part of the Udacity Artificial Intelligence Nanodegree](https://img.shields.io/badge/Udacity-Artificial--Inteligence%20Nanodegree-02b3e4.svg)
 
 # Question 1 (Naked Twins)
 Q: How do we use constraint propagation to solve the naked twins problem?  
